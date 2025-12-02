@@ -50,34 +50,24 @@
 <script>
 const API = "https://nw9ebhwhaj.execute-api.eu-north-1.amazonaws.com/";
 
-/* Fetch ONLY the PID values */
 async function getPID(deviceId) {
-    const url = `${API}history/${deviceId}?only=pid`;
-    const res = await fetch(url);
-    const arr = await res.json();
-
-    if (!Array.isArray(arr) || arr.length === 0) {
-        return null;  // No telemetry yet
-    }
-
-    return arr[arr.length - 1]; // last = newest record
+    const res = await fetch(`${API}commands/${deviceId}`);
+    return await res.json();
 }
 
 async function loadPID() {
     const A = await getPID("ESP32_A");
     const B = await getPID("ESP32_B");
 
-    // ESP32_A
-    document.getElementById("a_kp").textContent  = "Kp: " + (A?.kp ?? "...");
-    document.getElementById("a_ki").textContent  = "Ki: " + (A?.ki ?? "...");
-    document.getElementById("a_kd").textContent  = "Kd: " + (A?.kd ?? "...");
-    document.getElementById("a_lag").textContent = "T_LAG: " + (A?.tlag ?? "0");
+    document.getElementById("a_kp").textContent  = "Kp: " + A.kp;
+    document.getElementById("a_ki").textContent  = "Ki: " + A.ki;
+    document.getElementById("a_kd").textContent  = "Kd: " + A.kd;
+    document.getElementById("a_lag").textContent = "T_LAG: " + (A.T_LAG ?? "0");
 
-    // ESP32_B
-    document.getElementById("b_kp").textContent  = "Kp: " + (B?.kp ?? "...");
-    document.getElementById("b_ki").textContent  = "Ki: " + (B?.ki ?? "...");
-    document.getElementById("b_kd").textContent  = "Kd: " + (B?.kd ?? "...");
-    document.getElementById("b_lag").textContent = "T_LAG: " + (B?.tlag ?? "0");
+    document.getElementById("b_kp").textContent  = "Kp: " + B.kp;
+    document.getElementById("b_ki").textContent  = "Ki: " + B.ki;
+    document.getElementById("b_kd").textContent  = "Kd: " + B.kd;
+    document.getElementById("b_lag").textContent = "T_LAG: " + (B.T_LAG ?? "0");
 }
 
 // Load immediately
