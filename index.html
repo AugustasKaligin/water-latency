@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PID Coefficients Dashboard</title>
+
+<style>
+ body { font-family: Arial; padding: 20px; background: #e9eef3; }
+ h2 { margin-top: 0; }
+ .card {
+   background: white;
+   padding: 20px;
+   border-radius: 8px;
+   margin-bottom: 20px;
+   box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+   width: 300px;
+ }
+ .container {
+   display: flex;
+   gap: 30px;
+ }
+ .value-box {
+   font-size: 18px;
+   margin: 6px 0;
+ }
+</style>
+</head>
+
+<body>
+
+<h2>PID Coefficients & T_LAG</h2>
+<div class="container">
+    <div class="card">
+        <h3>ESP32_A</h3>
+        <div class="value-box" id="a_kp">Kp: ...</div>
+        <div class="value-box" id="a_ki">Ki: ...</div>
+        <div class="value-box" id="a_kd">Kd: ...</div>
+        <div class="value-box" id="a_lag">T_LAG: ...</div>
+    </div>
+
+    <div class="card">
+        <h3>ESP32_B</h3>
+        <div class="value-box" id="b_kp">Kp: ...</div>
+        <div class="value-box" id="b_ki">Ki: ...</div>
+        <div class="value-box" id="b_kd">Kd: ...</div>
+        <div class="value-box" id="b_lag">T_LAG: ...</div>
+    </div>
+</div>
+
+<script>
+const API = "https://nw9ebhwhaj.execute-api.eu-north-1.amazonaws.com/";
+
+async function getPID(deviceId) {
+    const res = await fetch(`${API}commands/${deviceId}`);
+    return await res.json();
+}
+
+async function loadPID() {
+    const A = await getPID("ESP32_A");
+    const B = await getPID("ESP32_B");
+
+    document.getElementById("a_kp").textContent  = "Kp: " + A.kp;
+    document.getElementById("a_ki").textContent  = "Ki: " + A.ki;
+    document.getElementById("a_kd").textContent  = "Kd: " + A.kd;
+    document.getElementById("a_lag").textContent = "T_LAG: " + (A.T_LAG ?? "0");
+
+    document.getElementById("b_kp").textContent  = "Kp: " + B.kp;
+    document.getElementById("b_ki").textContent  = "Ki: " + B.ki;
+    document.getElementById("b_kd").textContent  = "Kd: " + B.kd;
+    document.getElementById("b_lag").textContent = "T_LAG: " + (B.T_LAG ?? "0");
+}
+
+// Load immediately
+loadPID();
+
+// Refresh every 5 seconds
+setInterval(loadPID, 5000);
+</script>
+
+</body>
+</html>
